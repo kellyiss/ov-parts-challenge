@@ -40,42 +40,34 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         }
     """
     output = {}
-    if phase_codename == "dev":
+    if phase_codename == "dev1":
         print("Evaluating for Dev Phase")
         output["result"] = [
             {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
+                "test_split": {
+                    "h-IoU": random.randint(0, 99),
+                    "mIoU": random.randint(0, 99),
+                    "mIoU-base": random.randint(0, 99),
+                    "mIoU-unbase": random.randint(0, 99),
                 }
             }
         ]
         # To display the results in the result file
-        output["submission_result"] = output["result"][0]["train_split"]
+        output["submission_result"] = output["result"][0]["test_split"]
         print("Completed evaluation for Dev Phase")
-    elif phase_codename == "test":
+    elif phase_codename == "dev2":
         print("Evaluating for Test Phase")
         output["result"] = [
             {
-                "train_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
-                }
-            },
-            {
                 "test_split": {
-                    "Metric1": random.randint(0, 99),
-                    "Metric2": random.randint(0, 99),
-                    "Metric3": random.randint(0, 99),
-                    "Total": random.randint(0, 99),
+                    "h-IoU": random.randint(0, 99),
+                    "mIoU": random.randint(0, 99),
+                    "mIoU-base": random.randint(0, 99),
+                    "mIoU-unbase": random.randint(0, 99),
                 }
-            },
+            }
         ]
         # To display the results in the result file
-        output["submission_result"] = output["result"][0]
+        output["submission_result"] = output["result"][0]["test_split"]
         print("Completed evaluation for Test Phase")
     return output
