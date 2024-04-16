@@ -13,7 +13,7 @@ remote_evaluation: False
 is_docker_based: False
 start_date: 2024-04-05 00:00:00
 end_date: 2024-06-10 23:59:59
-published: True
+published: False
 
 leaderboard:
   - id: 1
@@ -22,7 +22,6 @@ leaderboard:
         "labels": ["h-IoU", "mIoU", "mIoU-base", "mIoU-unbase"],
         "default_order_by": "h-IoU",
         "metadata": {
-
         }
       }
   - id: 2
@@ -31,7 +30,6 @@ leaderboard:
         "labels": ["h-IoU", "mIoU", "mIoU-base", "mIoU-unbase"],
         "default_order_by": "mIoU",
         "metadata": {
-          
         }
       }
 
@@ -48,12 +46,21 @@ challenge_phases:
     codename: dev1
     max_submissions_per_day: 5
     max_submissions_per_month: 50
-    max_submissions: 60
+    max_submissions: 50
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
       - name: method_description
         is_visible: True
+    submission_meta_attributes:
+      - name: TextAttribute
+        description: Sample
+        type: text
+        required: False
+      - name: TextAttribute
+        description: Sample
+        type: text
+        required: False
     is_restricted_to_select_one_submission: True
     is_partial_submission_evaluation_enabled: False
     allowed_submission_file_types: ".json"
@@ -75,6 +82,15 @@ challenge_phases:
         is_visible: True
       - name: method_description
         is_visible: True
+    submission_meta_attributes:
+      - name: TextAttribute
+        description: Sample
+        type: text
+        required: False
+      - name: TextAttribute
+        description: Sample
+        type: text
+        required: False
     is_restricted_to_select_one_submission: True
     is_partial_submission_evaluation_enabled: False
     allowed_submission_file_types: ".json"
