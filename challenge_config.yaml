@@ -27,7 +27,7 @@ leaderboard:
   - id: 2
     schema:
       {
-        "labels": ["h-IoU", "mIoU", "mIoU-base", "mIoU-unbase"],
+        "labels": ["mIoU"],
         "default_order_by": "mIoU",
         "metadata": {
         }
