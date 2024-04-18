@@ -35,18 +35,18 @@ leaderboard:
 
 challenge_phases:
   - id: 1
-    name: Track 1 Dev Phase
+    name: Track 1 Test Phase
     description: templates/challenge_phase_1_description.html
     leaderboard_public: True
     is_public: True
     is_submission_public: False
     start_date: 2024-04-05 00:00:00
-    end_date: 2024-06-10 23:59:59
+    end_date: 2024-06-08 23:59:59
     test_annotation_file: annotations/sem_seg_gt.json
     codename: dev1
     max_submissions_per_day: 5
     max_submissions_per_month: 50
-    max_submissions: 50
+    max_submissions: 60
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
@@ -54,20 +54,20 @@ challenge_phases:
         is_visible: True
     submission_meta_attributes:
       - name: TextAttribute
-        description: Sample
+        description: Description
         type: text
         required: False
     is_restricted_to_select_one_submission: True
     is_partial_submission_evaluation_enabled: False
     allowed_submission_file_types: ".json"
   - id: 2
-    name: Track 2 Dev Phase
+    name: Track 2 Test Phase
     description: templates/challenge_phase_2_description.html
-    leaderboard_public: False
+    leaderboard_public: True
     is_public: True
     is_submission_public: False
     start_date: 2024-04-05 00:00:00
-    end_date: 2024-06-10 23:59:59
+    end_date: 2024-06-08 23:59:59
     test_annotation_file: annotations/sem_seg_gt.json
     codename: dev2
     max_submissions_per_day: 5
@@ -80,7 +80,7 @@ challenge_phases:
         is_visible: True
     submission_meta_attributes:
       - name: TextAttribute
-        description: Sample
+        description: Description
         type: text
         required: False
     is_restricted_to_select_one_submission: True
