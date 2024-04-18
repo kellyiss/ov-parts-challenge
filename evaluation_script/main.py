@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import pycocotools.mask as mask_utils
+from tqdm import tqdm
 
 def ann_to_rle(ann, h, w):
     """Convert annotation which can be polygons, uncompressed RLE to RLE.
@@ -37,24 +38,28 @@ def ann_to_mask(seg):
         rle = ann_to_rle(ann, height, width)
         return mask_utils.decode(rle)
 
-def masks_to_res_dict(masks, num_classes, obj=False):
+def masks_to_res_dict(masks, num_classes):
     res_dict = {}
     for mask in masks:
         file_name = mask['file_name']
         category_id = mask['category_id']
-        img_size = mask['segmentation']['size']
-        if obj:
-            file_name = f'{file_name}__{category_id}'
+        
         if file_name not in res_dict:
-            res_dict[file_name] = np.zeros(img_size, dtype=np.float) + num_classes
+            res_dict[file_name] = []
         
         if category_id >= num_classes:
             continue
-        bmask = ann_to_mask(mask['segmentation'])
-        # print(file_name, category_id)
-        # print(res_dict[file_name].shape, bmask.shape, category_id)
-        res_dict[file_name][bmask==1] = category_id
+        
+        res_dict[file_name].append([mask['category_id'], mask['segmentation']])
     return res_dict
+
+def rles_to_mask(inputs, img_size, num_classes):
+    output = np.zeros(img_size, dtype=int) + num_classes
+    for mask in inputs:
+        category_id = mask[0]
+        bmask = ann_to_mask(mask[1])
+        output[bmask==1] = category_id
+    return output
 
 
 def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwargs):
@@ -119,15 +124,15 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
 
     conf_matrix = np.zeros(((num_classes + 1), (num_classes + 1))).astype(int)
 
-    gt_obj_masks = gt_masks['object_sem_seg_gt']#json.load(open(test_annotation_file.replace('part', 'obj'), 'r'))
+    gt_obj_masks = gt_masks['object_sem_seg_gt']
     
-    for obj_mask in gt_obj_masks:
+    for obj_mask in tqdm(gt_obj_masks):
         file_name = obj_mask['file_name']
         file_name = file_name.split('__')[0]
         obj_binary_mask = ann_to_mask(obj_mask['segmentation'])
-        gt = gt_part_mask_dict[file_name].astype(int)
+        gt = rles_to_mask(gt_part_mask_dict[file_name],obj_binary_mask.shape,num_classes)
         gt[obj_binary_mask==0] = num_classes
-        pred = pred_part_mask_dict[file_name].astype(int)
+        pred = rles_to_mask(pred_part_mask_dict[file_name],obj_binary_mask.shape,num_classes)
         pred[obj_binary_mask==0] = num_classes
 
         conf_matrix += np.bincount(
@@ -135,13 +140,13 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
                 minlength=conf_matrix.size,
             ).reshape(conf_matrix.shape)
     
-    acc = np.full(num_classes, np.nan, dtype=np.float)
-    iou = np.full(num_classes, np.nan, dtype=np.float)
-    tp = conf_matrix.diagonal()[:-1].astype(np.float)
+    acc = np.full(num_classes, np.nan, dtype=float)
+    iou = np.full(num_classes, np.nan, dtype=float)
+    tp = conf_matrix.diagonal()[:-1].astype(float)
     
-    pos_gt = np.sum(conf_matrix[:-1, :-1], axis=0).astype(np.float)
+    pos_gt = np.sum(conf_matrix[:-1, :-1], axis=0).astype(float)
     class_weights = pos_gt / np.sum(pos_gt)
-    pos_pred = np.sum(conf_matrix[:-1, :-1], axis=1).astype(np.float)
+    pos_pred = np.sum(conf_matrix[:-1, :-1], axis=1).astype(float)
     acc_valid = pos_gt > 0
     acc[acc_valid] = tp[acc_valid] / pos_gt[acc_valid]
     iou_valid = (pos_gt + pos_pred) > 0
@@ -159,7 +164,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
     for set_name, set_inds in evaluation_set.items():
         iou_list = []
         set_inds = np.array(set_inds, int)
-        mask = np.zeros((len(iou),)).astype(np.bool)
+        mask = np.zeros((len(iou),)).astype(bool)
         mask[set_inds] = 1
         miou = np.sum(iou[mask][acc_valid[mask]]) / np.sum(iou_valid[mask])
         pacc = np.sum(tp[mask]) / np.sum(pos_gt[mask])
@@ -172,7 +177,7 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
         # output["pAcc-un{}".format(set_name)] = 100 * pacc
         iou_list.append(miou)
     res['h-IoU'] = 2 * (res['mIoU-base'] * res['mIoU-unbase']) / (res['mIoU-base'] + res['mIoU-unbase'])
-    
+    print(res)
     output = {}
     if phase_codename == "dev1":
         print("Evaluating for Dev Phase")
